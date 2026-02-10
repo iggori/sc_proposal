@@ -13,9 +13,12 @@ Build a Streamlit demo that shows 3 different AI use cases running through the s
 ```python
 # gateway.py - ~100 lines
 class AIGateway:
+    def __init__(self):
+        self.pii_vault = {}  # Simple dict for MVP; production uses Redis
+    
     def process(self, use_case, input_text, config):
-        # 1. PII anonymization (regex masking)
-        clean_input = self._anonymize_pii(input_text)
+        # 1. PII tokenization (reversible, not one-way masking)
+        tokenized_input = self._tokenize_pii(input_text)
         
         # 2. Model routing (based on complexity/cost)
         model = self._route_model(config)
@@ -178,6 +181,43 @@ class AIGateway:
 ```
 
 **Total code:** ~260 lines Python
+
+---
+
+## Key Innovation: Reversible PII Tokenization
+
+### The Problem with Simple Masking
+Simple PII masking (`email → [REDACTED]`) breaks systems that need to respond to users:
+- ❌ Can't send password reset emails (recipient unknown)
+- ❌ Can't update user records (original value lost)
+- ❌ Can't send notifications (no contact info)
+
+### The Solution: Token-Based Approach
+**MVP demonstrates the concept using simple dict storage:**
+
+```python
+# 1. Tokenize: Replace PII with reversible tokens
+"Contact john@example.com" → "Contact PII_EMAIL_a3f2b1"
+
+# 2. Store mapping (MVP uses dict; production uses Redis)
+self.pii_vault["PII_EMAIL_a3f2b1"] = "john@example.com"
+
+# 3. LLM processes tokenized text (compliant)
+LLM sees: "Contact PII_EMAIL_a3f2b1"
+
+# 4. Backend retrieves original value when needed
+original = self.pii_vault["PII_EMAIL_a3f2b1"]  # "john@example.com"
+# Can now actually send emails, update records, etc.
+
+# 5. UI shows masked version for privacy
+Display: "Contact j***@example.com"
+```
+
+### Production Upgrade Path
+- **MVP:** `self.pii_vault = {}` (in-memory dict)
+- **Production:** Redis/DynamoDB + AES-256 encryption + 1-hour TTL + access logging
+
+**Demo this:** Run `python3 demo_tokenization.py` to see the flow in action.
 
 ---
 

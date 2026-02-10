@@ -1,4 +1,4 @@
-# Scalable Capital AI Platform - Product Proposal
+# SC AI Platform - Product Proposal
 
 ## Executive Summary
 
@@ -44,11 +44,21 @@ A headless AI Gateway that provides:
 
 **Platform Primitives Demonstrated:**
 - ✅ Single API gateway serving multiple use cases
-- ✅ Automatic PII anonymization before model invocation
+- ✅ **Reversible PII tokenization** (not simple masking - preserves backend functionality)
 - ✅ Model routing (GPT-4o-mini vs GPT-4 based on complexity)
 - ✅ Output schema validation
 - ✅ Audit logging with cost tracking
 - ✅ Confidence scoring + human fallback
+
+**Key Innovation: Reversible PII Handling**
+Unlike simple redaction (`email → [REDACTED]`), the platform uses tokenization:
+- Replaces PII with tokens: `john@example.com → PII_EMAIL_a3f2b1`
+- Stores secure mapping (MVP: dict, Production: encrypted Redis)
+- LLM processes tokens (compliance ✓)
+- Backend retrieves originals for actions (functionality ✓)
+- UI shows masked versions (privacy ✓)
+
+This enables systems to actually respond to users, send emails, update records - not just analyze text.
 
 **Tech Stack:** Python (FastAPI) + Azure OpenAI + Terraform deployment configs
 

@@ -1,4 +1,5 @@
 import json
+from typing import Dict, Any, List
 
 # Template configurations for the AI Platform MVP
 
@@ -75,15 +76,15 @@ TEMPLATES = {
     }
 }
 
-def get_template(template_name: str) -> dict:
+def get_template(template_name: str) -> Dict[str, Any]:
     """Get template configuration by name"""
     return TEMPLATES.get(template_name)
 
-def get_template_names() -> list:
+def get_template_names() -> List[str]:
     """Get list of available template names"""
     return list(TEMPLATES.keys())
 
-def get_template_display_names() -> dict:
+def get_template_display_names() -> Dict[str, str]:
     """Get user-friendly display names for templates"""
     return {
         'support_ticket_classifier': 'Support Ticket Classifier',
@@ -93,7 +94,7 @@ def get_template_display_names() -> dict:
 
 # Sample input data for demo
 SAMPLE_INPUTS = {
-    'support_ticket_classifier': "Hi, I forgot my password and can't log into my account. Can you help me reset it?",
+    'support_ticket_classifier': "Hi, I forgot my password and can't log into my account. My email is john.doe@example.com and my phone is 555-123-4567. Can you help me reset it?",
     'onboarding_document_extractor': """Onboarding Document
 Name: John Smith
 Email: john.smith@email.com
@@ -101,5 +102,5 @@ Phone: 555-123-4567
 IBAN: DE89370400440532013000
 Nationality: German
 Risk Assessment: Low risk profile""",
-    'employee_faq_bot': "What's the parental leave policy at Scalable Capital?"
+    'employee_faq_bot': "What's the parental leave policy at SC?"
 }
