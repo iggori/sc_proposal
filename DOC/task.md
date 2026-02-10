@@ -36,7 +36,7 @@ A headless AI Gateway that provides:
 
 ### Proof of Concept: Multi-Use-Case AI Gateway
 
-**What I Built:** A working AI gateway demonstrating platform reusability across 3 use cases:
+**POC Design:** An AI gateway demonstrating platform reusability across 3 use cases:
 
 1. **Support Ticket Classifier** - Routes customer queries to appropriate team
 2. **Document Analyzer** - Extracts key info from onboarding documents
@@ -55,6 +55,45 @@ A headless AI Gateway that provides:
 **[POC Demo Link/Repository]:** `[To be added - Streamlit app or GitHub repo]`
 
 **Key Insight:** Same code, same guardrails, 3 different business problems solved. This is what platform thinking looks like.
+
+---
+
+### Template-Based Architecture
+
+**Platform provides pre-configured templates for common use cases:**
+
+**1. Classification Template**
+- Input: text, confidence threshold, categories
+- Built-in: PII anonymization, schema validation, audit logging
+- Output: category, confidence score, reasoning
+- Config: model choice, temperature, fallback rules
+
+**2. Extraction Template**
+- Input: document, schema definition
+- Built-in: structured output validation, field-level confidence
+- Output: JSON matching schema
+- Config: extraction strategy (regex + LLM, pure LLM, multi-pass)
+
+**3. Q&A Template**
+- Input: question, knowledge base reference
+- Built-in: RAG setup, citation requirements, hallucination checks
+- Output: answer + sources
+- Config: retrieval strategy, temperature, max tokens
+
+**4. Custom Workflow Template**
+- Input: workflow definition (YAML/JSON)
+- Built-in: step orchestration, conditional logic, AI invocation points
+- Output: workflow result + execution trace
+- Config: fully customizable steps, AI usage per step
+
+**Teams select template → configure parameters → deploy without reinventing guardrails.**
+
+Each template comes with:
+- Terraform deployment configs
+- Pre-configured guardrails
+- Monitoring dashboards
+- Cost estimation
+- Compliance checklist
 
 ---
 
@@ -92,6 +131,31 @@ Every step is measurable. Every failure is logged. Every edge case becomes a tes
 
 ---
 
+### C. Hallucination Mitigation (Configurable per Use Case)
+
+Platform supports multiple strategies; teams configure based on risk level:
+
+**Core Techniques:**
+1. **Prompt Engineering** - System constraints, few-shot examples, negative prompting
+2. **Model Fine-Tuning** - Feedback loops, human corrections, domain-specific retraining
+3. **RAG (Retrieval)** - Ground in authoritative sources, require citations
+4. **Constrained Generation** - Force JSON schemas, limit outputs to known entities
+5. **Multi-Model Validation** - Cross-check outputs between models
+6. **Context Injection** - Provide verified data directly in prompt
+7. **Post-Generation Checks** - LLM-as-judge, fact verification, contradiction detection
+8. **Temperature Controls** - Low temperature (0.0-0.3) for deterministic outputs
+
+**Configuration Example:**
+```yaml
+hallucination_mitigation:
+  primary: constrained_generation
+  temperature: 0.2
+  verification: post_gen_fact_check
+  human_fallback_threshold: 0.85
+```
+
+---
+
 ### B. Regulatory Guardrails: Risk Mitigation Controls
 
 **Challenge:** Prevent AI from violating GDPR, EU AI Act, and financial regulations.
@@ -104,7 +168,7 @@ Every step is measurable. Every failure is logged. Every edge case becomes a tes
    - **Max Token Limits:** Hard caps prevent exfiltration attempts via injection attacks
 
 2. **Output Validation**
-   - **Schema Enforcement:** All responses must conform to strict JSON schemas; free-form text rejected
+   - **Schema Enforcement:** Responses must conform to defined schemas (JSON for structured data, text wrapped in validation envelope for Q&A)
    - **Prohibited Content Filter:** Block outputs containing market predictions, regulatory interpretation, personal data
    - **Factual Grounding:** Responses must cite source (internal doc ID, FAQ ID, structured rule) - no invented facts
 
