@@ -236,4 +236,4 @@ This isn't just a demo - it's a vision for how companies can adopt AI safely at 
 
 ---
 
-*Demo created for SC AI Platform Product Manager role - February 2026*
+*Demo created for SC February 2026*
